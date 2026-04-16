@@ -1,4 +1,7 @@
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { ChatMember } from "../../chats/entities/chat-member.entity";
+import { Message } from "../../messages/entities/message.entity";
+import { ReadReceipt } from "../../messages/entities/read-receipt.entity";
 
 @Entity('users')
 export class User {
