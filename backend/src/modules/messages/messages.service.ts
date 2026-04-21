@@ -7,6 +7,6 @@ import { Repository } from "typeorm";
 export class MessagesService {
   constructor (
     @InjectRepository(Message)
-    private messagesRepositorys: Repository<Message>
+    private messagesRepository: Repository<Message>
   ) {}
 }

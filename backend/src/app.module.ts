@@ -3,6 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import databaseConfig from './config/database.config';
 import { UsersModule } from './modules/users/users.module';
+import { ChatsModule } from './modules/chats/chats.module';
+import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
@@ -14,7 +16,9 @@ import { UsersModule } from './modules/users/users.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => config.getOrThrow('database')
     }),
-    UsersModule
+    UsersModule,
+    ChatsModule,
+    MessagesModule
   ]
 })
 export class AppModule {}
