@@ -5,6 +5,7 @@ import databaseConfig from './config/database.config';
 import { UsersModule } from './modules/users/users.module';
 import { ChatsModule } from './modules/chats/chats.module';
 import { MessagesModule } from './modules/messages/messages.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MessagesModule } from './modules/messages/messages.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => config.getOrThrow('database')
     }),
+    AuthModule,
     UsersModule,
     ChatsModule,
     MessagesModule

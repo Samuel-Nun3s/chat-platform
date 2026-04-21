@@ -30,6 +30,10 @@ export class AuthService {
     return { accessToken, refreshToken }
   }
 
+  async refresh(userId: string, email: string) {
+    return this.generateTokens(userId, email);
+  }
+
   async register(dto: RegisterDto) {
     const user = await this.usersRepository.findOneBy({ email: dto.email });
 
