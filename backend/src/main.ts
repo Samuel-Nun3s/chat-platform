@@ -1,22 +1,19 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { createAdapter } from '@socket.io/redis-adapter';
-import { Redis } from 'ioredis';
-import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { RedisIoAdapter } from './config/redis-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  const pubClient = new Redis({
-    host: process.env.REDIS_HOST,
-    port: Number(process.env.REDIS_PORT)
-  });
-  const subClient = pubClient.duplicate();
+  const redisIoAdapter = new RedisIoAdapter(app);
+  await redisIoAdapter.connectToRedis();
+  app.useWebSocketAdapter(redisIoAdapter);
 
-  // const io = app.get(/* IoAdapter */);
-
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(process.env.PORT ?? 3000);
 }
+
 bootstrap();

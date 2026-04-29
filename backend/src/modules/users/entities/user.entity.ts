@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } f
 import { ChatMember } from "../../chats/entities/chat-member.entity";
 import { Message } from "../../messages/entities/message.entity";
 import { ReadReceipt } from "../../messages/entities/read-receipt.entity";
+import { Exclude } from "class-transformer";
 
 @Entity('users')
 export class User {
@@ -15,6 +16,7 @@ export class User {
   email!: string;
 
   @Column()
+  @Exclude()
   password!: string;
 
   @Column({ type: 'varchar', nullable: true })
