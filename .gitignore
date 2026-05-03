@@ -45,4 +45,8 @@ Thumbs.db
 postgres_data/
 redis_data/
 
+# Uploaded files (mantém apenas a estrutura via .gitkeep)
+backend/uploads/*
+!backend/uploads/.gitkeep
+
 docs/

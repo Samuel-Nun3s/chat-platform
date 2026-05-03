@@ -2,6 +2,7 @@ import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnectio
 import { Server, Socket } from "socket.io";
 import { SendMessageDto } from "../messages/dto/send-message.dto";
 import { Injectable, UseFilters, UseGuards } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
 import { MessagesService } from "../messages/messages.service";
 import { ChatsService } from "../chats/chats.service";
 import { WsJwtGuard } from "../../common/guards/ws-jwt.guard";
@@ -17,16 +18,41 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   constructor (
     private readonly messagesService: MessagesService,
-    private readonly chatsService: ChatsService
+    private readonly chatsService: ChatsService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  handleConnection(client: Socket) {
-    const user = client.data.user;
-    console.log(`Client connected: ${client.id} - User: ${user?.sub}`);
+  async handleConnection(client: Socket) {
+    const token = client.handshake.auth?.token;
+
+    if (!token) {
+      client.disconnect();
+      return;
+    }
+
+    try {
+      const payload = this.jwtService.verify<{ sub: string }>(token, {
+        secret: process.env.JWT_SECRET!,
+      });
+
+      client.data.user = payload;
+      client.join(`user:${payload.sub}`);
+
+      const chats = await this.chatsService.findUserChats(payload.sub);
+      chats.forEach((member) => client.join(member.chatId));
+
+      console.log(`Client connected: ${client.id} - User: ${payload.sub} - Rooms: ${chats.length}`);
+    } catch {
+      client.disconnect();
+    }
   }
 
   handleDisconnect(client: Socket) {
     console.log(`Client disconnected: ${client.id}`);
+  }
+
+  notifyUser(userId: string, event: string, data: unknown) {
+    this.server.to(`user:${userId}`).emit(event, data);
   }
 
   @SubscribeMessage('join_chat')
@@ -35,14 +61,20 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('send_message')
-  async handleMessage(client: Socket, dto: SendMessageDto) {
+  async handleMessage(_client: Socket, dto: SendMessageDto) {
     const message = await this.messagesService.saveMessage(dto);
     this.server.to(dto.chatId).emit('new_message', message);
   }
 
   @SubscribeMessage('mark_as_read')
-  async handleMarkAsRead(client: Socket, payload: { messageId: string; userId: string; chatId: string }) {
+  async handleMarkAsRead(_client: Socket, payload: { messageId: string; userId: string; chatId: string }) {
     const receipt = await this.messagesService.markAsRead(payload.messageId, payload.userId);
     this.server.to(payload.chatId).emit('message_read', receipt);
+  }
+
+  @SubscribeMessage('delete_message')
+  async handleDeleteMessage(client: Socket, payload: { messageId: string; chatId: string }) {
+    await this.messagesService.deleteMessage(payload.messageId, client.data.user.sub);
+    this.server.to(payload.chatId).emit('message_deleted', { messageId: payload.messageId, chatId: payload.chatId });
   }
 }

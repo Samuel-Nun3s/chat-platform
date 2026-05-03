@@ -28,7 +28,14 @@ export class UsersService {
 
   async update(id: string, dto: UpdateUserDto) {
     await this.findById(id);
-    return this.usersRepository.update({ id }, dto);
+    await this.usersRepository.update({ id }, dto);
+    return this.findById(id);
+  }
+
+  async updateAvatar(id: string, avatarUrl: string) {
+    await this.findById(id);
+    await this.usersRepository.update({ id }, { avatarUrl });
+    return this.findById(id);
   }
 
   async search(query: string) {

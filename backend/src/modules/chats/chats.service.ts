@@ -38,6 +38,8 @@ export class ChatsService {
     return this.chatMembersRepository
       .createQueryBuilder('member')
       .innerJoinAndSelect('member.chat', 'chat')
+      .leftJoinAndSelect('chat.members', 'chatMembers')
+      .leftJoinAndSelect('chatMembers.user', 'memberUser')
       .where('member.userId = :userId', { userId })
       .getMany();
   }

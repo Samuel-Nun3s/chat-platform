@@ -1,0 +1,70 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-primary: #0b0f0b;
+  --bg-sidebar: #111911;
+  --bg-chat: #0d130d;
+  --bg-input: #161e16;
+  --bg-hover: #1a241a;
+  --bg-active: #1e2e1e;
+  --bg-bubble-sent: #1a3a28;
+  --bg-bubble-received: #1c1c1c;
+  --bg-card: #141a14;
+
+  --green-primary: #2d6a4f;
+  --green-light: #3a8a63;
+  --green-muted: #52b788;
+  --green-accent: #74c69d;
+
+  --text-primary: #e0e8e0;
+  --text-secondary: #a0b8a0;
+  --text-muted: #607860;
+  --text-time: #708870;
+
+  --border: #1e2e1e;
+  --border-light: #253025;
+
+  --scrollbar-track: #0b0f0b;
+  --scrollbar-thumb: #2d6a4f;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  border: none;
+  outline: none;
+  background: none;
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
