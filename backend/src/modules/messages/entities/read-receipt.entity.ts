@@ -14,8 +14,11 @@ export class ReadReceipt {
   @Column({ name: 'user_id' })
   userId!: string;
 
-  @CreateDateColumn({ name: 'read_at' })
-  readAt!: Date;
+  @CreateDateColumn({ name: 'delivered_at' })
+  deliveredAt!: Date;
+
+  @Column({ name: 'read_at', type: 'timestamp', nullable: true })
+  readAt!: Date | null;
 
   @ManyToOne(() => Message, (message) => message.readReceipts)
   @JoinColumn({ name: 'message_id' })

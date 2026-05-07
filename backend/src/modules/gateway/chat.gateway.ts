@@ -56,25 +56,54 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('join_chat')
-  handleJoinChat(client: Socket, chatId: string) {
+  async handleJoinChat(client: Socket, chatId: string) {
+    await this.chatsService.assertChatMember(client.data.user.sub, chatId);
     client.join(chatId);
   }
 
   @SubscribeMessage('send_message')
-  async handleMessage(_client: Socket, dto: SendMessageDto) {
-    const message = await this.messagesService.saveMessage(dto);
+  async handleMessage(client: Socket, dto: SendMessageDto) {
+    const userId = client.data.user.sub;
+    await this.chatsService.assertChatMember(userId, dto.chatId);
+    const message = await this.messagesService.saveMessage(userId, dto);
     this.server.to(dto.chatId).emit('new_message', message);
   }
 
+  @SubscribeMessage('mark_as_delivered')
+  async handleMarkAsDelivered(client: Socket, payload: { messageId: string; chatId: string }) {
+    const userId = client.data.user.sub;
+    await this.chatsService.assertChatMember(userId, payload.chatId);
+    const receipt = await this.messagesService.markAsDelivered(payload.messageId, userId);
+    if (receipt) {
+      this.server.to(payload.chatId).emit('message_delivered', { ...receipt, chatId: payload.chatId });
+    }
+  }
+
   @SubscribeMessage('mark_as_read')
-  async handleMarkAsRead(_client: Socket, payload: { messageId: string; userId: string; chatId: string }) {
-    const receipt = await this.messagesService.markAsRead(payload.messageId, payload.userId);
-    this.server.to(payload.chatId).emit('message_read', receipt);
+  async handleMarkAsRead(client: Socket, payload: { messageId: string; chatId: string }) {
+    const userId = client.data.user.sub;
+    await this.chatsService.assertChatMember(userId, payload.chatId);
+    const receipt = await this.messagesService.markAsRead(payload.messageId, userId);
+    if (receipt) {
+      this.server.to(payload.chatId).emit('message_read', { ...receipt, chatId: payload.chatId });
+    }
+  }
+
+  @SubscribeMessage('mark_chat_as_read')
+  async handleMarkChatAsRead(client: Socket, payload: { chatId: string }) {
+    const userId = client.data.user.sub;
+    await this.chatsService.assertChatMember(userId, payload.chatId);
+    const receipts = await this.messagesService.markChatAsRead(payload.chatId, userId);
+    for (const receipt of receipts) {
+      this.server.to(payload.chatId).emit('message_read', { ...receipt, chatId: payload.chatId });
+    }
   }
 
   @SubscribeMessage('delete_message')
   async handleDeleteMessage(client: Socket, payload: { messageId: string; chatId: string }) {
-    await this.messagesService.deleteMessage(payload.messageId, client.data.user.sub);
+    const userId = client.data.user.sub;
+    await this.chatsService.assertChatMember(userId, payload.chatId);
+    await this.messagesService.deleteMessage(payload.messageId, userId);
     this.server.to(payload.chatId).emit('message_deleted', { messageId: payload.messageId, chatId: payload.chatId });
   }
 }

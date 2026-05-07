@@ -8,8 +8,4 @@ export class CreateChatDto {
   @IsString()
   @IsOptional()
   name?: string;
-
-  @IsString()
-  @IsOptional()
-  avatarUrl?: string;
 }

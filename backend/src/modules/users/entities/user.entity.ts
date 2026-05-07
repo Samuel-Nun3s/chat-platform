@@ -22,6 +22,10 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   avatarUrl!: string | null;
 
+  @Column({ name: 'token_version', type: 'int', default: 0 })
+  @Exclude()
+  tokenVersion!: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

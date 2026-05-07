@@ -12,7 +12,7 @@ export class WsJwtGuard implements CanActivate {
     const token = client.handshake.auth?.token;
 
     if (!token) {
-      throw new UnauthorizedException('Token not provided');
+      throw new UnauthorizedException('Token não fornecido');
     }
 
     const payload = await this.jwtService.verifyAsync(token, {

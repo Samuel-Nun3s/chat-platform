@@ -20,7 +20,7 @@ export class UsersService {
     });
 
     if (!user) {
-      throw new NotFoundException('User ID not found.');
+      throw new NotFoundException('Usuário não encontrado');
     }
 
     return user;

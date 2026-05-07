@@ -33,13 +33,13 @@ export class UsersController {
     limits: { fileSize: 5 * 1024 * 1024 },
     fileFilter: (_req, file, cb) => {
       if (!/^image\/(jpeg|png|gif|webp)$/.test(file.mimetype)) {
-        return cb(new BadRequestException('Only JPEG, PNG, GIF and WebP images are allowed'), false);
+        return cb(new BadRequestException('Apenas imagens JPEG, PNG, GIF e WebP são permitidas'), false);
       }
       cb(null, true);
     },
   }))
   async uploadAvatar(@Request() req, @UploadedFile() file: Express.Multer.File) {
-    if (!file) throw new BadRequestException('No file uploaded');
+    if (!file) throw new BadRequestException('Nenhum arquivo enviado');
     return this.userService.updateAvatar(req.user.id, `/uploads/avatars/${file.filename}`);
   }
 

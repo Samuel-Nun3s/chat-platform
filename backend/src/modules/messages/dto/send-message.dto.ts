@@ -6,9 +6,6 @@ export class SendMessageDto {
   chatId!: string
 
   @IsString()
-  senderId!: string
-
-  @IsString()
   content!: string
 
   @IsEnum(MessageType)
