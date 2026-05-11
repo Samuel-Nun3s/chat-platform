@@ -234,6 +234,25 @@ Acesse `http://localhost:5173`.
 
 **Servidor → Cliente:** `new_message`, `new_chat`, `chat_left`, `message_delivered`, `message_read`, `message_deleted`
 
+## Testes
+
+| Camada | Framework | Cobertura |
+|---|---|---|
+| Backend | Jest + ts-jest | 40 testes unitários nos services (`auth`, `chats`, `messages`, `users`) com repositórios e JwtService mockados. Cobre fluxos críticos: rotação de refresh token, regras de membership em chats privados/grupos, soft delete de mensagens, marcação de entregue/lida. |
+| Frontend | Vitest | 15 testes na `chatStore` (unread, lastActivity, removeChat, upsertReceipt) e na utility `findOrCreatePrivateChat` (find vs create, condições de match). |
+
+```bash
+# Backend
+cd backend && npm test
+# 4 test suites, 40 tests, ~1.7s
+
+# Frontend
+cd frontend && npm test
+# 2 test files, 15 tests, <500ms
+```
+
+> Próximos passos: tests e2e dos controllers via supertest (a infra já está pronta em `backend/test/`) e component tests no front com `@testing-library/react`.
+
 ## Decisões intencionais
 
 - **Sem migrations** — `synchronize: true` é mais rápido para iterar em dev e suficiente para portfolio. Em produção mudaria para migrations geradas por `typeorm-ts-node-esm`.
@@ -241,7 +260,6 @@ Acesse `http://localhost:5173`.
 - **`fetch` nativo no frontend** — sem Axios (versões recentes do Axios tiveram CVEs); o wrapper em [api.ts](frontend/src/services/api.ts) cobre o suficiente.
 - **Zustand** ao invés de Redux — menos boilerplate para o tamanho do projeto.
 - **CSS Modules** — sem CSS-in-JS; cada componente tem seu `.module.css`.
-- **Sem testes ainda** — próximo passo. A estrutura está pronta para tests unitários nos services e e2e dos endpoints.
 
 ## Licença
 
