@@ -51,3 +51,5 @@ backend/uploads/*
 
 docs/*
 !docs/screenshots/
+docs/screenshots/*.mp4
+docs/screenshots/*.webm

@@ -7,10 +7,6 @@ Plataforma de mensagens em tempo real construída como projeto pessoal de portfo
 Não é um produto pra produção — é um lugar pra estudar arquitetura, modelagem e UX em uma stack moderna.
 
 <p align="center">
-  <video src="docs/screenshots/demo.mp4" controls width="820"></video>
-</p>
-
-<p align="center">
   <img src="docs/screenshots/tela-de-login.png" alt="Tela de login" width="48%" />
   &nbsp;&nbsp;
   <img src="docs/screenshots/chat-group.png" alt="Conversa em grupo" width="48%" />
