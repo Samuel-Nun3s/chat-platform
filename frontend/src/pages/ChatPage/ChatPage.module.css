@@ -1,8 +1,27 @@
 .layout {
+  position: relative;
   display: flex;
   height: 100%;
   width: 100%;
   overflow: hidden;
+  background-color: var(--bg-canvas);
+  isolation: isolate;
+}
+
+.layout::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 0% 100%, rgba(45, 106, 79, 0.12), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 100% 0%, rgba(109, 213, 167, 0.06), transparent 65%);
+  z-index: -1;
+}
+
+.sidebarSlot {
+  display: flex;
+  flex-shrink: 0;
 }
 
 .main {
@@ -10,4 +29,21 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border-left: 1px solid var(--border);
+  min-width: 0;
+}
+
+/* ─────────── mobile: toggle sidebar / chat ─────────── */
+
+@media (max-width: 768px) {
+  .sidebarSlot { width: 100%; }
+  .main {
+    display: none;
+    border-left: none;
+  }
+  .hasActive .sidebarSlot { display: none; }
+  .hasActive .main {
+    display: flex;
+    width: 100%;
+  }
 }

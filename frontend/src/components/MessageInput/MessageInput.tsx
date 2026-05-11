@@ -14,7 +14,6 @@ export function MessageInput() {
 
     sendMessage({
       chatId: activeChatId,
-      senderId: user.id,
       content: text.trim(),
       type: 'text',
     });
@@ -35,7 +34,7 @@ export function MessageInput() {
     <div className={styles.container}>
       <textarea
         className={styles.input}
-        placeholder="Type a message..."
+        placeholder="Digite uma mensagem…"
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}

@@ -25,6 +25,14 @@ export interface ChatMember {
   user?: User;
 }
 
+export interface ReadReceipt {
+  id: string;
+  messageId: string;
+  userId: string;
+  deliveredAt: string;
+  readAt: string | null;
+}
+
 export interface Message {
   id: string;
   chatId: string;
@@ -32,6 +40,7 @@ export interface Message {
   content: string;
   type: 'text' | 'image' | 'file';
   createdAt: string;
+  readReceipts?: ReadReceipt[];
 }
 
 export interface AuthTokens {

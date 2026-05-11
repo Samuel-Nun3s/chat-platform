@@ -1,134 +1,198 @@
 .sidebar {
-  width: 320px;
-  min-width: 320px;
-  background-color: var(--bg-sidebar);
-  border-right: 1px solid var(--border);
+  width: 340px;
+  min-width: 340px;
+  background-color: var(--bg-surface);
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* ─────────── header ─────────── */
 
 .header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 16px 18px;
   border-bottom: 1px solid var(--border);
+  background-color: rgba(14, 20, 19, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .profile {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 4px 8px 4px 4px;
-  border-radius: 8px;
-  transition: background-color 0.15s;
+  gap: 12px;
+  padding: 4px 10px 4px 4px;
+  border-radius: var(--r-pill);
+  border: 1px solid transparent;
+  transition: all var(--dur-base) var(--ease-out);
   text-align: left;
+  max-width: 200px;
+  overflow: hidden;
 }
 
 .profile:hover {
   background-color: var(--bg-hover);
+  border-color: var(--border);
 }
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  background-color: var(--green-primary);
+  background: linear-gradient(135deg, var(--green-light), var(--green-primary));
   color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-family: var(--font-display);
+  font-weight: 500;
   font-size: 15px;
   object-fit: cover;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .username {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: 13.5px;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
+}
+
+.newChat, .logout {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  border-radius: var(--r-sm);
+  transition: all var(--dur-fast) var(--ease-out);
+  font-size: 18px;
+  line-height: 1;
 }
 
 .newChat {
-  color: var(--text-muted);
-  font-size: 22px;
   font-weight: 300;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.2s;
-  line-height: 1;
+  font-size: 22px;
 }
 
 .newChat:hover {
   color: var(--green-accent);
   background-color: var(--bg-hover);
-}
-
-.logout {
-  color: var(--text-muted);
-  font-size: 18px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.2s;
+  transform: rotate(90deg);
 }
 
 .logout:hover {
-  color: var(--text-secondary);
+  color: var(--text-primary);
   background-color: var(--bg-hover);
 }
+
+/* ─────────── search ─────────── */
 
 .search {
   padding: 12px 16px;
   border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+.search::before {
+  content: '⌕';
+  position: absolute;
+  left: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+  font-family: var(--font-display);
 }
 
 .search input {
   width: 100%;
-  background-color: var(--bg-input);
+  background-color: var(--bg-surface-2);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  padding: 9px 12px 9px 32px;
   color: var(--text-primary);
   font-size: 13px;
+  letter-spacing: -0.005em;
+  transition: all var(--dur-base) var(--ease-out);
 }
 
-.search input::placeholder {
-  color: var(--text-muted);
-}
+.search input::placeholder { color: var(--text-muted); }
+.search input:hover { border-color: var(--border-strong); }
 
 .search input:focus {
-  border-color: var(--green-primary);
+  border-color: var(--border-accent);
+  background-color: var(--bg-surface-3);
+  box-shadow: 0 0 0 4px rgba(109, 213, 167, 0.06);
 }
+
+/* ─────────── chat list ─────────── */
 
 .list {
   flex: 1;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 8px 8px 24px;
+  scroll-behavior: smooth;
 }
 
 .empty {
   text-align: center;
   color: var(--text-muted);
-  padding: 32px 16px;
+  padding: 48px 16px;
   font-size: 13px;
+  font-style: italic;
+  font-family: var(--font-display);
+  letter-spacing: -0.005em;
+  line-height: 1.5;
 }
 
 .chatItem {
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 11px 12px;
   text-align: left;
-  transition: background-color 0.15s;
+  border-radius: var(--r-md);
+  margin-bottom: 1px;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+
+.chatItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 3px;
+  height: 22px;
+  background-color: var(--green-accent);
+  border-radius: var(--r-pill);
+  transition: transform var(--dur-base) var(--ease-spring);
 }
 
 .chatItem:hover {
@@ -137,22 +201,27 @@
 
 .chatItemActive {
   background-color: var(--bg-active);
-  border-left: 3px solid var(--green-primary);
+}
+
+.chatItemActive::before {
+  transform: translate(0%, -50%) scale(1);
 }
 
 .chatAvatar {
-  width: 42px;
-  height: 42px;
-  min-width: 42px;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
   border-radius: 50%;
-  background-color: var(--green-primary);
+  background: linear-gradient(135deg, var(--green-light), var(--green-primary));
   color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 17px;
   object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
 }
 
 .chatInfo {
@@ -161,47 +230,54 @@
   gap: 2px;
   overflow: hidden;
   flex: 1;
+  min-width: 0;
 }
 
 .chatName {
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-primary);
   font-size: 14px;
+  letter-spacing: -0.005em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .chatNameUnread {
-  color: var(--green-accent);
+  color: var(--green-mint);
+  font-weight: 600;
 }
 
 .chatPreview {
-  font-size: 12px;
+  font-size: 12.5px;
   color: var(--text-muted);
+  letter-spacing: -0.005em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .chatType {
-  font-size: 11px;
+  font-size: 10px;
+  font-family: var(--font-mono);
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.08em;
 }
 
 .unreadBadge {
-  background-color: var(--green-primary);
-  color: var(--text-primary);
-  font-size: 11px;
+  background: linear-gradient(135deg, var(--green-accent), var(--green-muted));
+  color: #0a1410;
+  font-size: 10.5px;
   font-weight: 700;
+  font-family: var(--font-mono);
   min-width: 20px;
   height: 20px;
   padding: 0 6px;
-  border-radius: 10px;
+  border-radius: var(--r-pill);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(109, 213, 167, 0.25);
 }

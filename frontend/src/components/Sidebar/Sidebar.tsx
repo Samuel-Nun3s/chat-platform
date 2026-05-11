@@ -34,9 +34,9 @@ export function Sidebar() {
   function getChatName(member: any) {
     if (member.chat.type === 'private') {
       const other = member.chat.members?.find((m: any) => m.userId !== user?.id);
-      return other?.user?.name ?? 'Private Chat';
+      return other?.user?.name ?? 'Conversa privada';
     }
-    return member.chat.name ?? 'Group';
+    return member.chat.name ?? 'Grupo';
   }
 
   function getChatInitial(member: any) {
@@ -75,7 +75,7 @@ export function Sidebar() {
   return (
     <div className={styles.sidebar}>
       <div className={styles.header}>
-        <button className={styles.profile} onClick={() => setShowProfile(true)} title="Edit profile">
+        <button className={styles.profile} onClick={() => setShowProfile(true)} title="Editar perfil">
           {myAvatar ? (
             <img src={myAvatar} alt={user?.name ?? ''} className={styles.avatar} />
           ) : (
@@ -87,11 +87,11 @@ export function Sidebar() {
           <button
             className={styles.newChat}
             onClick={() => setShowNewChat(true)}
-            title="New conversation"
+            title="Nova conversa"
           >
             +
           </button>
-          <button className={styles.logout} onClick={logout} title="Logout">
+          <button className={styles.logout} onClick={logout} title="Sair">
             ⎋
           </button>
         </div>
@@ -99,7 +99,7 @@ export function Sidebar() {
 
       <div className={styles.search}>
         <input
-          placeholder="Search conversations..."
+          placeholder="Buscar conversas..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
@@ -108,7 +108,7 @@ export function Sidebar() {
       <div className={styles.list}>
         {visibleChats.length === 0 && (
           <p className={styles.empty}>
-            {chats.length === 0 ? 'No conversations yet' : 'No matches'}
+            {chats.length === 0 ? 'Nenhuma conversa ainda' : 'Nenhum resultado'}
           </p>
         )}
         {visibleChats.map((member) => {

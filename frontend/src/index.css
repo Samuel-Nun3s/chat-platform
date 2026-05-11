@@ -1,3 +1,5 @@
+/* ────────── Accord: a refined dark-green design system ────────── */
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -5,31 +7,85 @@
 }
 
 :root {
-  --bg-primary: #0b0f0b;
-  --bg-sidebar: #111911;
-  --bg-chat: #0d130d;
-  --bg-input: #161e16;
-  --bg-hover: #1a241a;
-  --bg-active: #1e2e1e;
-  --bg-bubble-sent: #1a3a28;
-  --bg-bubble-received: #1c1c1c;
-  --bg-card: #141a14;
+  /* canvas — darkest layer, near-black with green undertone */
+  --bg-canvas: #07090a;
+  --bg-primary: #0a0e0d;
 
+  /* surfaces — progressively lifted */
+  --bg-surface: #0e1413;
+  --bg-surface-2: #131a18;
+  --bg-surface-3: #1a221f;
+  --bg-elevated: #1f2926;
+
+  /* legacy aliases (kept for component compat) */
+  --bg-sidebar: var(--bg-surface);
+  --bg-chat: var(--bg-primary);
+  --bg-input: var(--bg-surface-2);
+  --bg-hover: rgba(255, 255, 255, 0.035);
+  --bg-active: rgba(109, 213, 167, 0.08);
+  --bg-card: var(--bg-surface);
+
+  /* bubbles */
+  --bg-bubble-sent: linear-gradient(135deg, #1d4a35 0%, #1a3d2c 100%);
+  --bg-bubble-sent-solid: #1d4a35;
+  --bg-bubble-received: var(--bg-surface-2);
+
+  /* greens — sage to emerald to mint */
+  --green-deep: #1a3d2c;
   --green-primary: #2d6a4f;
-  --green-light: #3a8a63;
+  --green-light: #3d8b6a;
   --green-muted: #52b788;
-  --green-accent: #74c69d;
+  --green-accent: #6dd5a7;
+  --green-mint: #a5e5c7;
+  --green-glow: rgba(109, 213, 167, 0.32);
 
-  --text-primary: #e0e8e0;
-  --text-secondary: #a0b8a0;
-  --text-muted: #607860;
-  --text-time: #708870;
+  /* text */
+  --text-primary: #e8efe9;
+  --text-secondary: #a7b5ad;
+  --text-muted: #6a7a72;
+  --text-time: #748580;
 
-  --border: #1e2e1e;
-  --border-light: #253025;
+  /* borders */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.10);
+  --border-accent: rgba(109, 213, 167, 0.25);
 
-  --scrollbar-track: #0b0f0b;
-  --scrollbar-thumb: #2d6a4f;
+  /* status colors */
+  --read-blue: #6db8ff;
+  --warn: #e8b864;
+  --danger: #e57373;
+
+  /* typography */
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-ui: 'Geist', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 380ms;
+
+  /* shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 0 1px rgba(109, 213, 167, 0.18), 0 8px 32px rgba(109, 213, 167, 0.08);
+
+  /* radii */
+  --r-xs: 6px;
+  --r-sm: 8px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  /* scrollbar */
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.06);
+  --scrollbar-thumb-hover: rgba(109, 213, 167, 0.18);
 }
 
 html, body, #root {
@@ -39,12 +95,29 @@ html, body, #root {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-ui);
+  font-feature-settings: 'ss01', 'ss03', 'cv11';
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-size: 14px;
   line-height: 1.5;
+  letter-spacing: -0.005em;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  isolation: isolate;
+}
+
+/* atmospheric grain — subtle SVG noise overlay sitting behind UI content */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.025;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.7 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
 }
 
 button {
@@ -54,6 +127,16 @@ button {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
+  letter-spacing: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--green-accent);
+  outline-offset: 2px;
+  border-radius: var(--r-xs);
 }
 
 input, textarea {
@@ -65,6 +148,40 @@ input, textarea {
   background: none;
 }
 
-::-webkit-scrollbar { width: 4px; }
+::selection {
+  background-color: var(--green-glow);
+  color: var(--text-primary);
+}
+
+/* refined scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
-::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 2px; }
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--r-pill);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  transition: background var(--dur-base);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); background-clip: padding-box; }
+
+* { scrollbar-width: thin; scrollbar-color: var(--scrollbar-thumb) transparent; }
+
+/* helpful for serif-rendered display text */
+.display-serif {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-feature-settings: 'ss01';
+  letter-spacing: -0.02em;
+}
+
+/* fade-in for top-level mount */
+@keyframes appear {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

@@ -4,7 +4,9 @@ import { useChatStore } from '../../../store/chatStore';
 import { api } from '../../../services/api';
 import { joinChat } from '../../../hooks/useSocket';
 import { toast } from '../../../store/toastStore';
-import type { User } from '../../../types';
+import { findOrCreatePrivateChat } from '../../../services/privateChat';
+import { avatarUrl } from '../../../utils/avatar';
+import type { ChatMember, User } from '../../../types';
 import styles from './NewChatModal.module.css';
 
 interface Props {
@@ -20,7 +22,7 @@ export function NewChatModal({ onClose }: Props) {
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
   const { tokens, user: me } = useAuthStore();
-  const { setChats } = useChatStore();
+  const { chats, setChats, setActiveChat } = useChatStore();
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -64,22 +66,33 @@ export function NewChatModal({ onClose }: Props) {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!tokens) return;
+    if (!tokens || !me) return;
 
     if (type === 'private' && selected.length === 0) {
-      toast.error('Select a user to start a private chat');
+      toast.error('Selecione um usuário para iniciar uma conversa privada');
       return;
     }
     if (type === 'group' && !groupName.trim()) {
-      toast.error('Enter a group name');
+      toast.error('Digite um nome para o grupo');
       return;
     }
 
     setLoading(true);
     try {
+      if (type === 'private') {
+        const target = selected[0];
+        const result = await findOrCreatePrivateChat(me.id, target.id, chats, tokens.accessToken);
+        setChats(result.chats);
+        joinChat(result.chatId);
+        setActiveChat(result.chatId);
+        toast.success(result.isNew ? 'Conversa criada!' : 'Conversa reaberta');
+        onClose();
+        return;
+      }
+
       const chat = await api.post<{ id: string }>('/chats', {
         type,
-        name: type === 'group' ? groupName : undefined,
+        name: groupName,
       }, tokens.accessToken);
 
       await Promise.all(
@@ -88,13 +101,14 @@ export function NewChatModal({ onClose }: Props) {
         )
       );
 
-      const chats = await api.get<any[]>('/chats', tokens.accessToken);
-      setChats(chats);
+      const updatedChats = await api.get<ChatMember[]>('/chats', tokens.accessToken);
+      setChats(updatedChats);
       joinChat(chat.id);
-      toast.success('Chat created!');
+      setActiveChat(chat.id);
+      toast.success('Conversa criada!');
       onClose();
     } catch (err: any) {
-      toast.error(err.message ?? 'Failed to create chat');
+      toast.error(err.message ?? 'Falha ao criar conversa');
     } finally {
       setLoading(false);
     }
@@ -106,7 +120,7 @@ export function NewChatModal({ onClose }: Props) {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2>New Conversation</h2>
+          <h2>Nova conversa</h2>
           <button className={styles.closeBtn} onClick={onClose}>×</button>
         </div>
 
@@ -117,23 +131,23 @@ export function NewChatModal({ onClose }: Props) {
               className={`${styles.typeBtn} ${type === 'group' ? styles.typeBtnActive : ''}`}
               onClick={() => handleTypeChange('group')}
             >
-              Group
+              Grupo
             </button>
             <button
               type="button"
               className={`${styles.typeBtn} ${type === 'private' ? styles.typeBtnActive : ''}`}
               onClick={() => handleTypeChange('private')}
             >
-              Private
+              Privada
             </button>
           </div>
 
           {type === 'group' && (
             <div className={styles.field}>
-              <label>Group name</label>
+              <label>Nome do grupo</label>
               <input
                 type="text"
-                placeholder="Enter group name..."
+                placeholder="Digite o nome do grupo…"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
                 autoFocus
@@ -142,11 +156,11 @@ export function NewChatModal({ onClose }: Props) {
           )}
 
           <div className={styles.field}>
-            <label>{type === 'private' ? 'Find user' : 'Add members'}</label>
+            <label>{type === 'private' ? 'Buscar usuário' : 'Adicionar membros'}</label>
             <div className={styles.searchWrapper}>
               <input
                 type="text"
-                placeholder="Search by name or email..."
+                placeholder="Buscar por nome ou email…"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 autoFocus={type === 'private'}
@@ -157,34 +171,45 @@ export function NewChatModal({ onClose }: Props) {
 
             {results.length > 0 && (
               <ul className={styles.results}>
-                {results.map((u) => (
-                  <li key={u.id}>
-                    <button type="button" className={styles.resultItem} onClick={() => selectUser(u)}>
-                      <div className={styles.resultAvatar}>{u.name.charAt(0).toUpperCase()}</div>
-                      <div className={styles.resultInfo}>
-                        <span className={styles.resultName}>{u.name}</span>
-                        <span className={styles.resultEmail}>{u.email}</span>
-                      </div>
-                    </button>
-                  </li>
-                ))}
+                {results.map((u) => {
+                  const img = avatarUrl(u.avatarUrl);
+                  return (
+                    <li key={u.id}>
+                      <button type="button" className={styles.resultItem} onClick={() => selectUser(u)}>
+                        {img ? (
+                          <img src={img} alt={u.name} className={styles.resultAvatar} />
+                        ) : (
+                          <div className={styles.resultAvatar}>{u.name.charAt(0).toUpperCase()}</div>
+                        )}
+                        <div className={styles.resultInfo}>
+                          <span className={styles.resultName}>{u.name}</span>
+                          <span className={styles.resultEmail}>{u.email}</span>
+                        </div>
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             )}
 
             {selected.length > 0 && (
               <div className={styles.chips}>
-                {selected.map((u) => (
-                  <span key={u.id} className={styles.chip}>
-                    {u.name}
-                    <button type="button" onClick={() => removeUser(u.id)}>×</button>
-                  </span>
-                ))}
+                {selected.map((u) => {
+                  const img = avatarUrl(u.avatarUrl);
+                  return (
+                    <span key={u.id} className={styles.chip}>
+                      {img && <img src={img} alt={u.name} className={styles.chipAvatar} />}
+                      {u.name}
+                      <button type="button" onClick={() => removeUser(u.id)}>×</button>
+                    </span>
+                  );
+                })}
               </div>
             )}
           </div>
 
           <button className={styles.submit} type="submit" disabled={loading || !canSubmit}>
-            {loading ? 'Creating...' : 'Create'}
+            {loading ? 'Criando…' : 'Criar'}
           </button>
         </form>
       </div>

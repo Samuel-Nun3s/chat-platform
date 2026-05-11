@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { ChatMember, Message } from '../types';
+import type { ChatMember, Message, ReadReceipt } from '../types';
 
 interface ChatState {
   chats: ChatMember[];
@@ -15,6 +15,7 @@ interface ChatState {
   removeChat: (chatId: string) => void;
   incrementUnread: (chatId: string) => void;
   clearUnread: (chatId: string) => void;
+  upsertReceipt: (chatId: string, receipt: ReadReceipt) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
@@ -85,5 +86,20 @@ export const useChatStore = create<ChatState>((set) => ({
       const unreadCounts = { ...state.unreadCounts };
       delete unreadCounts[chatId];
       return { unreadCounts };
+    }),
+  upsertReceipt: (chatId, receipt) =>
+    set((state) => {
+      const list = state.messages[chatId];
+      if (!list) return state;
+      const next = list.map((msg) => {
+        if (msg.id !== receipt.messageId) return msg;
+        const receipts = msg.readReceipts ?? [];
+        const idx = receipts.findIndex((r) => r.userId === receipt.userId);
+        const merged = idx >= 0
+          ? receipts.map((r, i) => (i === idx ? { ...r, ...receipt } : r))
+          : [...receipts, receipt];
+        return { ...msg, readReceipts: merged };
+      });
+      return { messages: { ...state.messages, [chatId]: next } };
     }),
 }));

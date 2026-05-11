@@ -1,7 +1,7 @@
 import { WebSocketGateway, WebSocketServer, SubscribeMessage, OnGatewayConnection, OnGatewayDisconnect } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { SendMessageDto } from "../messages/dto/send-message.dto";
-import { Injectable, UseFilters, UseGuards } from "@nestjs/common";
+import { Injectable, Logger, UseFilters, UseGuards } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { MessagesService } from "../messages/messages.service";
 import { ChatsService } from "../chats/chats.service";
@@ -15,6 +15,8 @@ import { WsExceptionFilter } from "../../common/filters/ws-exception.filter";
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server!: Server;
+
+  private readonly logger = new Logger(ChatGateway.name);
 
   constructor (
     private readonly messagesService: MessagesService,
@@ -41,14 +43,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const chats = await this.chatsService.findUserChats(payload.sub);
       chats.forEach((member) => client.join(member.chatId));
 
-      console.log(`Client connected: ${client.id} - User: ${payload.sub} - Rooms: ${chats.length}`);
+      this.logger.log(`Client connected ${client.id} (user ${payload.sub}, ${chats.length} rooms)`);
     } catch {
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Client disconnected: ${client.id}`);
+    this.logger.log(`Client disconnected ${client.id}`);
   }
 
   notifyUser(userId: string, event: string, data: unknown) {

@@ -30,9 +30,9 @@ export function ProfileModal({ onClose }: Props) {
       formData.append('avatar', file);
       const updated = await api.upload<User>('/users/me/avatar', formData, tokens.accessToken);
       setUser(updated);
-      toast.success('Avatar updated');
+      toast.success('Foto atualizada');
     } catch (err: any) {
-      toast.error(err.message ?? 'Failed to upload avatar');
+      toast.error(err.message ?? 'Falha ao enviar foto');
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -50,10 +50,10 @@ export function ProfileModal({ onClose }: Props) {
     try {
       const updated = await api.patch<User>('/users/me', { name: name.trim() }, tokens.accessToken);
       setUser(updated);
-      toast.success('Profile updated');
+      toast.success('Perfil atualizado');
       onClose();
     } catch (err: any) {
-      toast.error(err.message ?? 'Failed to update profile');
+      toast.error(err.message ?? 'Falha ao atualizar perfil');
     } finally {
       setSavingName(false);
     }
@@ -63,7 +63,7 @@ export function ProfileModal({ onClose }: Props) {
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
-          <h2>Edit profile</h2>
+          <h2>Editar perfil</h2>
           <button className={styles.closeBtn} onClick={onClose}>×</button>
         </div>
 
@@ -73,14 +73,14 @@ export function ProfileModal({ onClose }: Props) {
             className={styles.avatarBtn}
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading}
-            title="Change profile photo"
+            title="Trocar foto do perfil"
           >
             {avatarSrc ? (
               <img src={avatarSrc} alt={user?.name ?? ''} className={styles.avatarImg} />
             ) : (
               <div className={styles.avatarFallback}>{initial}</div>
             )}
-            <span className={styles.avatarOverlay}>{uploading ? '...' : '📷'}</span>
+            <span className={styles.avatarOverlay}>{uploading ? '…' : '📷'}</span>
           </button>
           <input
             ref={fileInputRef}
@@ -89,12 +89,12 @@ export function ProfileModal({ onClose }: Props) {
             className={styles.fileInput}
             onChange={handleAvatarPick}
           />
-          <p className={styles.hint}>Click to change photo · PNG, JPG, GIF, WebP up to 5MB</p>
+          <p className={styles.hint}>Clique para trocar a foto · PNG, JPG, GIF, WebP até 5MB</p>
         </div>
 
         <form className={styles.form} onSubmit={handleSaveName}>
           <div className={styles.field}>
-            <label>Name</label>
+            <label>Nome</label>
             <input
               type="text"
               value={name}
@@ -110,7 +110,7 @@ export function ProfileModal({ onClose }: Props) {
           </div>
 
           <button className={styles.submit} type="submit" disabled={savingName || !name.trim()}>
-            {savingName ? 'Saving...' : 'Save'}
+            {savingName ? 'Salvando…' : 'Salvar'}
           </button>
         </form>
       </div>

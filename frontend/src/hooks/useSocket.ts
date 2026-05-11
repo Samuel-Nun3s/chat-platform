@@ -2,8 +2,9 @@ import { useEffect } from 'react';
 import { connectSocket, disconnectSocket, getSocket } from '../services/socket';
 import { useAuthStore } from '../store/authStore';
 import { useChatStore } from '../store/chatStore';
+import { toast } from '../store/toastStore';
 import { api } from '../services/api';
-import type { Message } from '../types';
+import type { Message, ReadReceipt } from '../types';
 
 export function useSocket(token: string | undefined) {
   useEffect(() => {
@@ -20,8 +21,14 @@ export function useSocket(token: string | undefined) {
       const { activeChatId, addMessage, incrementUnread } = useChatStore.getState();
       const { user } = useAuthStore.getState();
       addMessage(message);
-      if (message.chatId !== activeChatId && message.senderId !== user?.id) {
-        incrementUnread(message.chatId);
+
+      if (message.senderId !== user?.id) {
+        socket.emit('mark_as_delivered', { messageId: message.id, chatId: message.chatId });
+        if (message.chatId !== activeChatId) {
+          incrementUnread(message.chatId);
+        } else {
+          socket.emit('mark_as_read', { messageId: message.id, chatId: message.chatId });
+        }
       }
     });
 
@@ -37,8 +44,17 @@ export function useSocket(token: string | undefined) {
       useChatStore.getState().removeMessage(chatId, messageId);
     });
 
-    socket.on('message_read', () => {
-      // Read receipts are received here. UI for read indicators can be added later.
+    socket.on('message_delivered', (payload: ReadReceipt & { chatId: string }) => {
+      useChatStore.getState().upsertReceipt(payload.chatId, payload);
+    });
+
+    socket.on('message_read', (payload: ReadReceipt & { chatId: string }) => {
+      useChatStore.getState().upsertReceipt(payload.chatId, payload);
+    });
+
+    socket.on('chat_left', ({ chatId }: { chatId: string }) => {
+      useChatStore.getState().removeChat(chatId);
+      toast.info('Você foi removido(a) de uma conversa');
     });
 
     return () => {
@@ -46,7 +62,9 @@ export function useSocket(token: string | undefined) {
       socket.off('new_message');
       socket.off('new_chat');
       socket.off('message_deleted');
+      socket.off('message_delivered');
       socket.off('message_read');
+      socket.off('chat_left');
       disconnectSocket();
     };
   }, [token]);
@@ -58,7 +76,6 @@ export function joinChat(chatId: string) {
 
 export function sendMessage(payload: {
   chatId: string;
-  senderId: string;
   content: string;
   type: 'text';
 }) {
@@ -69,6 +86,6 @@ export function deleteMessage(messageId: string, chatId: string) {
   getSocket()?.emit('delete_message', { messageId, chatId });
 }
 
-export function markAsRead(messageId: string, userId: string, chatId: string) {
-  getSocket()?.emit('mark_as_read', { messageId, userId, chatId });
+export function markChatAsRead(chatId: string) {
+  getSocket()?.emit('mark_chat_as_read', { chatId });
 }

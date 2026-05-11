@@ -2,51 +2,90 @@
   display: flex;
   align-items: flex-end;
   gap: 10px;
-  padding: 14px 20px;
-  background-color: var(--bg-sidebar);
+  padding: 14px 20px 18px;
+  background-color: rgba(14, 20, 19, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-top: 1px solid var(--border);
+  position: relative;
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: -16px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: linear-gradient(to bottom, transparent, rgba(7, 9, 10, 0.4));
+  pointer-events: none;
 }
 
 .input {
   flex: 1;
-  background-color: var(--bg-input);
+  background-color: var(--bg-surface-2);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 10px 14px;
+  border-radius: var(--r-lg);
+  padding: 11px 16px;
   color: var(--text-primary);
   resize: none;
-  max-height: 120px;
+  max-height: 140px;
   line-height: 1.5;
-  transition: border-color 0.2s;
+  font-size: 14px;
+  letter-spacing: -0.005em;
+  transition: border-color var(--dur-base), background-color var(--dur-base), box-shadow var(--dur-base);
+}
+
+.input:hover {
+  border-color: var(--border-strong);
 }
 
 .input:focus {
-  border-color: var(--green-primary);
+  border-color: var(--border-accent);
+  background-color: var(--bg-surface-3);
+  box-shadow: 0 0 0 4px rgba(109, 213, 167, 0.06);
 }
 
 .input::placeholder {
   color: var(--text-muted);
+  font-style: italic;
+  font-family: var(--font-display);
+  letter-spacing: -0.005em;
 }
 
 .sendBtn {
-  width: 40px;
-  height: 40px;
-  min-width: 40px;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
   border-radius: 50%;
-  background-color: var(--green-primary);
+  background: linear-gradient(135deg, var(--green-light), var(--green-primary));
   color: var(--text-primary);
   font-size: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-base);
+  box-shadow: 0 4px 14px rgba(45, 106, 79, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .sendBtn:hover:not(:disabled) {
-  background-color: var(--green-light);
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 8px 22px rgba(45, 106, 79, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.sendBtn:active:not(:disabled) {
+  transform: translateY(0) scale(0.97);
 }
 
 .sendBtn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
+  background: var(--bg-surface-3);
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .container { padding: 10px 14px 14px; gap: 8px; }
+  .input { padding: 10px 14px; font-size: 15px; }
+  .sendBtn { width: 40px; height: 40px; min-width: 40px; }
 }

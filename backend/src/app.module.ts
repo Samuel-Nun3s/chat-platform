@@ -7,6 +7,7 @@ import { ChatsModule } from './modules/chats/chats.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { GatewayModule } from './modules/gateway/gateway.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { GatewayModule } from './modules/gateway/gateway.module';
     ChatsModule,
     MessagesModule,
     GatewayModule
-  ]
+  ],
+  controllers: [HealthController]
 })
 export class AppModule {}

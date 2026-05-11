@@ -1,11 +1,12 @@
 import { io, Socket } from 'socket.io-client';
+import { API_BASE } from '../utils/avatar';
 
 let socket: Socket | null = null;
 
 export function connectSocket(token: string): Socket {
   if (socket?.connected) return socket;
 
-  socket = io('http://localhost:3000', {
+  socket = io(API_BASE, {
     auth: { token },
     transports: ['websocket'],
   });
