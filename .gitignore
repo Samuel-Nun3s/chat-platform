@@ -49,4 +49,5 @@ redis_data/
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-docs/
+docs/*
+!docs/screenshots/
